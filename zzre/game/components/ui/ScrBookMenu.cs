@@ -7,8 +7,8 @@ namespace zzre.game.components.ui;
 public struct ScrBookMenu
 {
     public Inventory Inventory;
-    public FairyRow[] Fairies;
-    public Dictionary<components.ui.ElementId, FairyRow> FairyButtons;
+    public SpellRow[] Spells;
+    public Dictionary<components.ui.ElementId, SpellRow> SpellButtons;
     public DefaultEcs.Entity Sidebar;
     public DefaultEcs.Entity Crosshair;
 }
