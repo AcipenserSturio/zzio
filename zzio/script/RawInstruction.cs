@@ -35,7 +35,7 @@ public class RawInstruction
     {
         var fullMatch = RegexInstruction.Match(instruction.Trim());
         if (!fullMatch.Success)
-            throw new ArgumentException("Failed to parse instruction", nameof(instruction));
+            throw new ArgumentException($"Failed to parse instruction {instruction}");
         Command = fullMatch.Groups[1].Value;
 
         if (fullMatch.Groups[2].Length == 0)

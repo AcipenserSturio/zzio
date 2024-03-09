@@ -46,8 +46,8 @@ public partial class ScrBookMenu : BaseScreen<components.ui.ScrBookMenu, message
         book.Crosshair = default;
 
         preload.CreateImage(entity)
-            .With(-new Vector2(320, 240))
             .WithBitmap("col000")
+            .With(components.ui.FullAlignment.Center)
             .WithRenderOrder(1)
             .Build();
 

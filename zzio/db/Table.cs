@@ -18,7 +18,10 @@ public class Table
         {
             Row row = new();
             row.Read(reader);
-            rows.Add(row.uid, row);
+            if (!rows.ContainsKey(row.uid))
+                rows.Add(row.uid, row);
+            else
+                Console.WriteLine($"Malformed DB: {row.uid} already exists");
         }
     }
 
