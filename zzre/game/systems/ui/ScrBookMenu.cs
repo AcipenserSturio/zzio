@@ -21,6 +21,8 @@ public partial class ScrBookMenu : BaseScreen<components.ui.ScrBookMenu, message
     ];
     private static readonly UID UIDEvol = new (0x69226721); // Evolution at level
 
+    private static readonly int columns = 9;
+
     public ScrBookMenu(ITagContainer diContainer) : base(diContainer, BlockFlags.All)
     {
         db = diContainer.GetTag<MappedDB>();
@@ -33,6 +35,7 @@ public partial class ScrBookMenu : BaseScreen<components.ui.ScrBookMenu, message
         if (!inventory.Contains(StdItemId.FairyBook))
             return;
 
+        World.Publish(new messages.SpawnSample($"resources/audio/sfx/gui/_g006.wav"));
         var entity = World.CreateEntity();
         entity.Set<components.ui.ScrBookMenu>();
         ref var book = ref entity.Get<components.ui.ScrBookMenu>();
@@ -162,7 +165,7 @@ public partial class ScrBookMenu : BaseScreen<components.ui.ScrBookMenu, message
     }
 
     private static Vector2 FairyButtonPos(int fairyI) {
-        return new Vector2(226 + 45 * (fairyI % 9), 66 + 45 * (fairyI / 9));
+        return new Vector2(226 + 45 * (fairyI % columns), 66 + 45 * (fairyI / columns));
     }
 
     protected override void Update(float timeElapsed, in DefaultEcs.Entity entity, ref components.ui.ScrBookMenu bookMenu)
