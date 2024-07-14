@@ -19,6 +19,11 @@ public static class ZZIOExtensions
 
     public static Quaternion ToZZRotation(this Vector3 v) =>
         Quaternion.Conjugate(Quaternion.CreateFromRotationMatrix(Matrix4x4.CreateLookAt(Vector3.Zero, v * -1f, Vector3.UnitY)));
+    public static Vector3 FromZZRotation(this Quaternion q)
+    {
+        Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(Quaternion.Conjugate(q));
+        return Vector3.Normalize(new Vector3(rotationMatrix.M13, rotationMatrix.M23, rotationMatrix.M33));
+    }
 
     public static RgbaByte ToVeldrid(this IColor c) => new(c.r, c.g, c.b, c.a);
     public static RgbaFloat ToVeldrid(this FColor c) => new(c.r, c.g, c.b, c.a);
