@@ -25,6 +25,9 @@ public static class ZZIOExtensions
         return Vector3.Normalize(new Vector3(rotationMatrix.M13, rotationMatrix.M23, rotationMatrix.M33));
     }
 
+    public static Vector3 ToZZRotationVector(this Quaternion rotation) =>
+        Vector3.Transform(-Vector3.UnitZ, rotation) * -1f;
+
     public static RgbaByte ToVeldrid(this IColor c) => new(c.r, c.g, c.b, c.a);
     public static RgbaFloat ToVeldrid(this FColor c) => new(c.r, c.g, c.b, c.a);
     public static FColor ToFColor(this Vector4 v) => new(v.X, v.Y, v.Z, v.W);
