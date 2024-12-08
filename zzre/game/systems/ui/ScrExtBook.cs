@@ -22,6 +22,7 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
     private static readonly UID UIDEvol = new(0x69226721); // Evolution at level
     private const int bookColumns = 15;
     private static Vector2 sidebarOffset = new Vector2(-159, -159);
+    private static Vector2 crosshairOffset = new Vector2(-2, -2);
 
     public ScrExtBookMenu(ITagContainer diContainer) : base(diContainer, BlockFlags.All)
     {
@@ -44,6 +45,7 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
         book.FairyButtons = [];
         book.Sidebar = default;
         book.Crosshair = default;
+        book.CurrentFairy = 0;
 
         preload.CreateImage(entity)
             .With(components.ui.FullAlignment.Center)
@@ -64,30 +66,16 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
         var fairies = book.Fairies;
         for (int i = 0; i < 215; i++)
         {
-            // if (inventory.Contains(fairies[i].CardId))
-            {
-                var element = new components.ui.ElementId(1 + i);
-                var button = preload.CreateButton(entity)
-                    .With(element)
-                    .With(Mid + FairyButtonPos(i))
-                    .With(new components.ui.ButtonTiles(fairies[i].CardId.EntityId))
-                    .With(UIPreloadAsset.Wiz000)
-                    .Build();
-                button.Set(button.Get<Rect>().GrownBy(new Vector2(5, 5))); // No gaps
-                button.Set(new components.ui.Silent());
-                book.FairyButtons.Add(element, fairies[i]);
-
-                // In the original engine, only the first fairy is checked for isInUse
-                // This is an intentional bug fix
-                if (inventory.Fairies.Any(c => fairies[i].CardId == c.cardId && c.isInUse))
-                {
-                    preload.CreateImage(entity)
-                        .With(Mid + FairyButtonPos(i))
-                        .With(UIPreloadAsset.Inf000, 16)
-                        .WithRenderOrder(-1)
-                        .Build();
-                }
-            }
+            var element = new components.ui.ElementId(1 + i);
+            var button = preload.CreateButton(entity)
+                .With(element)
+                .With(Mid + FairyButtonPos(i))
+                .With(new components.ui.ButtonTiles(fairies[i].CardId.EntityId))
+                .With(UIPreloadAsset.Wiz000)
+                .Build();
+            button.Set(button.Get<Rect>().GrownBy(new Vector2(5, 5))); // No gaps
+            button.Set(new components.ui.Silent());
+            book.FairyButtons.Add(element, i);
         }
     }
 
@@ -167,34 +155,49 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
             -95 + 45 * (fairyI / bookColumns)
         );
 
-    protected override void Update(float timeElapsed, in DefaultEcs.Entity entity, ref components.ui.ScrExtBook bookMenu)
+    private void TrySetCurrentFairy(int fairyI)
     {
-        base.Update(timeElapsed, entity, ref bookMenu);
+        var entity = Set.GetEntities()[0];
+        ref var book = ref entity.Get<components.ui.ScrExtBook>();
+        var fairyRow = book.Fairies.ElementAtOrDefault(fairyI);
+        if (fairyRow == default)
+            return;
+
+        book.CurrentFairy = fairyI;
+        book.Sidebar.Dispose();
+        book.Sidebar = CreateSidebar(preload, entity, fairyRow!, ref book);
+        book.Crosshair.Dispose();
+        book.Crosshair = preload.CreateImage(entity)
+            .With(Mid + crosshairOffset + FairyButtonPos(fairyI))
+            .With(UIPreloadAsset.Dnd000, 0)
+            .WithRenderOrder(-2)
+            .Build();
     }
 
-    private void HandleElementDown(DefaultEcs.Entity entity, components.ui.ElementId id)
+    private void HandleElementDown(DefaultEcs.Entity clickedEntity, components.ui.ElementId id)
     {
-        var bookMenuEntity = Set.GetEntities()[0];
-        ref var book = ref bookMenuEntity.Get<components.ui.ScrExtBook>();
+        var entity = Set.GetEntities()[0];
+        ref var book = ref entity.Get<components.ui.ScrExtBook>();
 
-        if (book.FairyButtons.TryGetValue(id, out var fairyRow))
-        {
-            book.Sidebar.Dispose();
-            book.Sidebar = CreateSidebar(preload, entity, fairyRow, ref book);
-            book.Crosshair.Dispose();
-            book.Crosshair = preload.CreateImage(entity)
-                .With(Mid + new Vector2(-2, -2) + FairyButtonPos(book.Fairies.IndexOf(fairyRow)))
-                .With(UIPreloadAsset.Dnd000, 0)
-                .WithRenderOrder(-2)
-                .Build();
-        }
+        if (book.FairyButtons.TryGetValue(id, out var fairyI))
+            TrySetCurrentFairy(fairyI);
     }
 
     protected override void HandleKeyDown(KeyCode key)
     {
-        var bookMenuEntity = Set.GetEntities()[0];
+        var entity = Set.GetEntities()[0];
+        ref var book = ref entity.Get<components.ui.ScrExtBook>();
+
         base.HandleKeyDown(key);
-        if (key == KeyCode.KReturn || key == KeyCode.KEscape || key == KeyCode.KF6)
+        if (key == KeyCode.KLeft)
+            TrySetCurrentFairy(book.CurrentFairy - 1);
+        else if (key == KeyCode.KRight)
+            TrySetCurrentFairy(book.CurrentFairy + 1);
+        else if (key == KeyCode.KUp)
+            TrySetCurrentFairy(book.CurrentFairy - bookColumns);
+        else if (key == KeyCode.KDown)
+            TrySetCurrentFairy(book.CurrentFairy + bookColumns);
+        else if (key == KeyCode.KReturn || key == KeyCode.KEscape || key == KeyCode.KF6)
             Set.DisposeAll();
     }
 }

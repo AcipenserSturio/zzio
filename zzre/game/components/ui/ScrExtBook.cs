@@ -7,7 +7,8 @@ public struct ScrExtBook
 {
     public Inventory Inventory;
     public FairyRow[] Fairies;
-    public Dictionary<components.ui.ElementId, FairyRow> FairyButtons;
+    public int CurrentFairy;
+    public Dictionary<components.ui.ElementId, int> FairyButtons;
     public DefaultEcs.Entity Sidebar;
     public DefaultEcs.Entity Crosshair;
 }
