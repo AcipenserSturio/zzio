@@ -19,6 +19,11 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
         new(0xB031B8B1), // Jump Ability
         new(0xB6CA5A11)  // Special
     ];
+    private string StatsText() =>
+        String.Join("\n", UIDStatNames.Select(uid => db.GetText(uid).Text));
+    private string StatsLights(int[] values) =>
+        String.Join("\n", values.Select(value => UIBuilder.GetLightsIndicator(value)));
+
     private static readonly UID UIDEvol = new(0x69226721); // Evolution at level
     private const int bookColumns = 15;
     private static Vector2 sidebarOffset = new Vector2(-159, -159);
@@ -118,10 +123,24 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
                 .With(UIPreloadAsset.Fnt002)
                 .Build();
 
-        CreateStat(preload, entity, 0, Math.Min(500, fairyRow.MHP) / 100);
-        CreateStat(preload, entity, 1, fairyRow.MovSpeed + 1);
-        CreateStat(preload, entity, 2, fairyRow.JumpPower + 1);
-        CreateStat(preload, entity, 3, fairyRow.CriticalHit + 1);
+        preload.CreateLabel(entity)
+            .With(Mid + sidebarOffset + new Vector2(21, 271))
+            .WithText(StatsText())
+            .WithLineHeight(17)
+            .With(UIPreloadAsset.Fnt002)
+            .Build();
+
+        preload.CreateLabel(entity)
+            .With(Mid + sidebarOffset + new Vector2(111, 266))
+            .WithText(StatsLights([
+                Math.Min(500, fairyRow.MHP) / 100,
+                fairyRow.MovSpeed + 1,
+                fairyRow.JumpPower + 1,
+                fairyRow.CriticalHit + 1
+            ]))
+            .WithLineHeight(17)
+            .With(UIPreloadAsset.Fnt001)
+            .Build();
 
         const float MaxTextWidth = 190f;
         preload.CreateLabel(entity)
@@ -132,21 +151,6 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
             .Build();
 
         return entity;
-    }
-
-    private void CreateStat(UIBuilder preload, in DefaultEcs.Entity entity, int index, int value)
-    {
-        preload.CreateLabel(entity)
-            .With(Mid + sidebarOffset + new Vector2(21, 271 + index * 17))
-            .WithText(db.GetText(UIDStatNames[index]).Text)
-            .With(UIPreloadAsset.Fnt002)
-            .Build();
-
-        preload.CreateLabel(entity)
-            .With(Mid + sidebarOffset + new Vector2(111, 266 + index * 17))
-            .WithText(UIBuilder.GetLightsIndicator(value))
-            .With(UIPreloadAsset.Fnt001)
-            .Build();
     }
 
     private static Vector2 FairyButtonPos(int fairyI) =>
