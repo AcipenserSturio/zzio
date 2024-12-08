@@ -69,6 +69,7 @@ public class UI : BaseDisposable, ITagContainer
             new systems.ui.ScrDeck(this),
             new systems.ui.ScrRuneMenu(this),
             new systems.ui.ScrBookMenu(this),
+            new systems.ui.ScrExtBookMenu(this),
             new systems.ui.ScrMapMenu(this),
             new systems.ui.ScrGotCard(this),
             new systems.ui.ScrNotification(this),

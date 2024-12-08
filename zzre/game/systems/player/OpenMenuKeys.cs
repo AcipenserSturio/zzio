@@ -11,6 +11,7 @@ public class OpenMenuKeys : ISystem<float>
     private const KeyCode BookMenuKey = KeyCode.KF3;
     private const KeyCode MapMenuKey = KeyCode.KF4;
     private const KeyCode DeckMenuKey = KeyCode.KF5;
+    private const KeyCode ExtBookKey = KeyCode.KF6;
     // private const KeyCode EscapeKey = KeyCode.Escape;
 
     public bool IsEnabled { get; set; } = true;
@@ -43,6 +44,7 @@ public class OpenMenuKeys : ISystem<float>
             case BookMenuKey: ui.Publish<messages.ui.OpenBookMenu>(); break;
             case MapMenuKey: ui.Publish<messages.ui.OpenMapMenu>(); break;
             case DeckMenuKey: ui.Publish<messages.ui.OpenDeck>(); break;
+            case ExtBookKey: ui.Publish<messages.ui.OpenExtBook>(); break;
         }
     }
 
