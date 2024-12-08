@@ -20,7 +20,8 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
         new(0xB6CA5A11)  // Special
     ];
     private static readonly UID UIDEvol = new(0x69226721); // Evolution at level
-    private const int bookColumns = 20;
+    private const int bookColumns = 15;
+    private static Vector2 sidebarOffset = new Vector2(-159, -159);
 
     public ScrExtBookMenu(ITagContainer diContainer) : base(diContainer, BlockFlags.All)
     {
@@ -46,7 +47,7 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
 
         preload.CreateImage(entity)
             .With(components.ui.FullAlignment.Center)
-            .WithBitmap("col000")
+            .WithBitmap("ext000")
             .WithRenderOrder(1)
             .Build();
 
@@ -100,31 +101,31 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
         var element = new components.ui.ElementId(0);
         preload.CreateButton(entity)
             .With(element)
-            .With(Mid + new Vector2(160, 218))
+            .With(Mid + sidebarOffset + new Vector2(160, 218))
             .With(new components.ui.ButtonTiles(fairyRow.CardId.EntityId))
             .With(UIPreloadAsset.Wiz000)
             .Build();
 
         preload.CreateLabel(entity)
-            .With(Mid + new Vector2(21, 57))
+            .With(Mid + sidebarOffset + new Vector2(21, 57))
             .WithText($"#{fairyI} {fairyRow.Name}")
             .With(UIPreloadAsset.Fnt000)
             .Build();
 
         preload.CreateImage(entity)
-            .With(Mid + new Vector2(22, 81))
+            .With(Mid + sidebarOffset + new Vector2(22, 81))
             .With(UIPreloadAsset.Cls000, (int)fairyRow.Class0)
             .Build();
 
         preload.CreateLabel(entity)
-            .With(Mid + new Vector2(36, 80))
+            .With(Mid + sidebarOffset + new Vector2(36, 80))
             .WithText(preload.GetClassText(fairyRow.Class0))
             .With(UIPreloadAsset.Fnt002)
             .Build();
 
         if (fairyRow.EvolVar != -1)
             preload.CreateLabel(entity)
-                .With(Mid + new Vector2(22, 246))
+                .With(Mid + sidebarOffset + new Vector2(22, 246))
                 .WithText($"{db.GetText(UIDEvol).Text} {fairyRow.EvolVar}")
                 .With(UIPreloadAsset.Fnt002)
                 .Build();
@@ -136,7 +137,7 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
 
         const float MaxTextWidth = 190f;
         preload.CreateLabel(entity)
-            .With(Mid + new Vector2(21, 346))
+            .With(Mid + sidebarOffset + new Vector2(21, 346))
             .WithText(fairyRow.Info)
             .With(UIPreloadAsset.Fnt002)
             .WithLineWrap(MaxTextWidth)
@@ -148,22 +149,23 @@ public partial class ScrExtBookMenu : BaseScreen<components.ui.ScrExtBook, messa
     private void CreateStat(UIBuilder preload, in DefaultEcs.Entity entity, int index, int value)
     {
         preload.CreateLabel(entity)
-            .With(Mid + new Vector2(21, 271 + index * 17))
+            .With(Mid + sidebarOffset + new Vector2(21, 271 + index * 17))
             .WithText(db.GetText(UIDStatNames[index]).Text)
             .With(UIPreloadAsset.Fnt002)
             .Build();
 
         preload.CreateLabel(entity)
-            .With(Mid + new Vector2(111, 266 + index * 17))
+            .With(Mid + sidebarOffset + new Vector2(111, 266 + index * 17))
             .WithText(UIBuilder.GetLightsIndicator(value))
             .With(UIPreloadAsset.Fnt001)
             .Build();
     }
 
-    private static Vector2 FairyButtonPos(int fairyI)
-    {
-        return new Vector2(226 + 45 * (fairyI % bookColumns), 66 + 45 * (fairyI / bookColumns));
-    }
+    private static Vector2 FairyButtonPos(int fairyI) =>
+        new Vector2(
+            75 + 45 * (fairyI % bookColumns),
+            -95 + 45 * (fairyI / bookColumns)
+        );
 
     protected override void Update(float timeElapsed, in DefaultEcs.Entity entity, ref components.ui.ScrExtBook bookMenu)
     {
